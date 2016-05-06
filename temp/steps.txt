@@ -1,0 +1,67 @@
+Installing a python webapp using docker:
+
+Tutorial: https://www.digitalocean.com/community/tutorials/docker-explained-how-to-containerize-python-web-applications
+
+Another tutorial for reference : https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-getting-started
+
+Replace the step:
+
+sudo sh -c "echo deb http://get.docker.io/ubuntu docker main\
+> /etc/apt/sources.list.d/docker.list"
+
+With
+
+echo "deb http://get.docker.io/ubuntu docker main" | sudo tee /etc/apt/sources.list.d/docker.list
+
+OR
+
+sudo sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+
+Inside docker container:
+
+apt-get install vim
+
+to use vim.
+
+
+THIS IS A DOCKER FILE FOR A MOD WSGI PYTHON APP SKELETON:
+
+############################################################
+# Dockerfile to build Python WSGI Application Containers
+# Based on Ubuntu
+############################################################
+
+# Set the base image to Ubuntu
+FROM ubuntu
+
+# File Author / Maintainer
+MAINTAINER Maintaner Name
+
+# Add the application resources URL
+RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main universe" >> /etc/apt/sources.list
+
+# Update the sources list
+RUN apt-get update
+
+# Install basic applications
+RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
+
+# Install Python and Basic Python Tools
+RUN apt-get install -y python python-dev python-distribute python-pip
+
+# Copy the application folder inside the container
+ADD /my_application /my_application
+
+# Get pip to download and install requirements:
+RUN pip install -r /my_application/requirements.txt
+
+# Expose ports
+EXPOSE 80
+
+# Set the default directory where CMD will execute
+WORKDIR /my_application
+
+# Set the default command to execute    
+# when creating a new container
+# i.e. using CherryPy to serve the application
+CMD python server.py
